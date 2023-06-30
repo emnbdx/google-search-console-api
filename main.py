@@ -61,8 +61,7 @@ def get_file():
 
 
 def keywords_to_csv(file, mode, dimensions, result):
-    res_folder = '\\results\\'
-    path = os.getcwd() + res_folder + file
+    path = os.path.join('results', file)
     with open(path, mode, encoding='utf-8', newline='') as f:
         writer = csv.writer(f, delimiter=';')
         if mode == 'w':
@@ -77,8 +76,7 @@ def keywords_to_csv(file, mode, dimensions, result):
 
 
 def check_index_to_csv(file, result):
-    res_folder = '\\results\\'
-    path = os.getcwd() + res_folder + file
+    path = os.path.join('results', file)
     with open(path, 'w', encoding='utf-8', newline='') as f:
         writer = csv.writer(f, delimiter=';')
         heading = ['url', 'coverageState', 'robotsTxtState', 'indexingState', 'lastCrawlTime',
@@ -89,21 +87,21 @@ def check_index_to_csv(file, result):
             row = [key]
             if value is not None:
                 row += [
-                    value['inspectionResult']['indexStatusResult']['coverageState'],
-                    value['inspectionResult']['indexStatusResult']['robotsTxtState'],
-                    value['inspectionResult']['indexStatusResult']['indexingState'],
-                    value['inspectionResult']['indexStatusResult']['lastCrawlTime'],
+                    value['inspectionResult']['indexStatusResult'].get('coverageState', ''),
+                    value['inspectionResult']['indexStatusResult'].get('robotsTxtState', ''),
+                    value['inspectionResult']['indexStatusResult'].get('indexingState', ''),
+                    value['inspectionResult']['indexStatusResult'].get('lastCrawlTime', '')
                 ]
                 try:
                     row += [
-                        value['inspectionResult']['indexStatusResult']['googleCanonical'],
-                        value['inspectionResult']['indexStatusResult']['userCanonical']
+                        value['inspectionResult']['indexStatusResult'].get('googleCanonical', ''),
+                        value['inspectionResult']['indexStatusResult'].get('userCanonical', '')
                     ]
                 except KeyError:
                     row += [None, None]
 
                 try:
-                    row.append(value['inspectionResult']['mobileUsabilityResult']['verdict'])
+                    row.append(value['inspectionResult']['mobileUsabilityResult'].get('verdict', ''))
                 except KeyError:
                     row.append(None)
             else:
@@ -231,15 +229,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-    # Old clear not unique values func for Keywords Search Analytics results
-    # One day it will be back :-)
-    # def clear_not_unique(self):
-    #     with open(self.file, 'r', encoding='utf-8', newline='') as f:
-    #         reader = csv.reader(f, delimiter=';')
-    #         all_keys = {rows[0]: rows[1:] for rows in reader}
-    #     with open(self.file, 'w', encoding='utf-8', newline='') as f:
-    #         writer = csv.writer(f, delimiter=';')
-    #         for _key, _value in all_keys.items():
-    #             row = [_key, _value[0], _value[1], _value[2], _value[3], _value[4]]
-    #             writer.writerow(row)
